@@ -26,7 +26,7 @@ jobs:
         continue-on-error: true
         run: |
             cat <<EOF > main.py
-            print ("hello world")
+            print ("This is in dev branch")
             EOF
             python3 main.py
             echo "dev build is success" > result.txt
@@ -56,7 +56,7 @@ jobs:
         id: run-python-program
         run: |
             cat <<EOF > main.py
-            print ("hello world")
+            print ("This is in main branch")
             EOF
             python3 main.py
             echo "prod build is success" > result.txt
