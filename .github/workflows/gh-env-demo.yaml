@@ -1,0 +1,70 @@
+name: Github env demo
+run-name: Testing Github environments
+on:
+  push:
+    branches:
+      - 'main'
+      - 'dev'
+
+jobs:
+
+  development:
+    if: ${{ github.ref == 'refs/heads/dev' }}
+    environment: dev
+    runs-on: ubuntu-latest 
+    steps:
+            
+      - name: Accessing dev environment variable and secret
+        run: |
+            echo "Dev environment variable can be accessed using syntax ${{ vars.DEV_ENV_VAR }}"
+            echo "Dev environment secret value can be accessed using syntax ${{ secrets.DEV_SECRET }}"
+      
+      # Simulate building a tiny Python app in the dev environment.
+      # Replace with real build steps when needed.
+      - name: Run python program
+        id: run-python-program
+        continue-on-error: true
+        run: |
+            cat <<EOF > main.py
+            print ("hello world")
+            EOF
+            python3 main.py
+            echo "dev build is success" > result.txt
+      
+      - if: ${{ steps.run-python-program.outcome != 'failure'}}
+        name: Upload artifact from development
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev_result
+          path: result.txt
+          retention-days: 1
+
+  production:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    environment: prod
+    runs-on: ubuntu-latest
+    steps:
+          
+      - name: Accessing prod environment variable and secret
+        run: |
+            echo "Prod environment variable can be accessed using syntax ${{ vars.PROD_ENV_VAR }}"
+            echo "Prod environment secret can be accessed using syntax ${{ secrets.PROD_SECRET }}"
+      
+      # Simulate building a tiny Python app in the prod environment.
+      # Replace with real build steps when needed.      
+      - name: Run python program
+        id: run-python-program
+        run: |
+            cat <<EOF > main.py
+            print ("hello world")
+            EOF
+            python3 main.py
+            echo "prod build is success" > result.txt
+            
+      - if: ${{ steps.run-python-program.outcome != 'failure'}}
+        name: Upload artifact from development
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod_result
+          path: result.txt
+          retention-days: 1      
